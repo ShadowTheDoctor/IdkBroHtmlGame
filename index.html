@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Moja Firma - Gra Ekonomiczna</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Biznes Symulator</h1>
+        <div class="stats">
+            <p>Pieniądze: <span id="money">0</span> $</p>
+            <p>Pracownicy: <span id="workers">0</span></p>
+        </div>
+
+        <button onclick="clickMoney()">Zarabiaj (Klik)</button>
+        <button onclick="buyWorker()">Kup pracownika (Koszt: <span id="worker-cost">10</span> $)</button>
+        
+        <hr>
+        <button onclick="saveToCloud()">Zapisz w chmurze</button>
+        <button onclick="resetGame()" style="background: red;">Resetuj Postęp</button>
+        <button onclick="loadFromCloud()">Wczytaj z chmury</button>
+
+        <p id="NotEnoughMoneyText"></p>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script type="module">
+  // 1. Ładujemy biblioteki bezpośrednio z internetu (zamiast z npm)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+  // 2. Twoje dane (przepisane z Twojego zdjęcia)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFxJ8N39pfafqRhenVyLxNRXJAJKvCEZA",
+    authDomain: "htmlgame-1a1ad.firebaseapp.com",
+    databaseURL: "https://htmlgame-1a1ad-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "htmlgame-1a1ad",
+    storageBucket: "htmlgame-1a1ad.firebasestorage.app",
+    messagingSenderId: "5688837787",
+    appId: "1:5688837787:web:e4465107525852e006b87e"
+  };
+
+  // 3. Inicjalizacja połączenia
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 4. Funkcje zapisu dostępne dla przycisków
+  window.cloudSave = function() {
+    // gameState to Twój obiekt z pieniędzmi i pracownikami
+    set(ref(db, 'saves/gracz1'), gameState) 
+      .then(() => alert("Gra zapisana w Firebase!"))
+      .catch((e) => console.error("Błąd:", e));
+  };
+
+  window.cloudLoad = function() {
+    get(ref(db, 'saves/gracz1')).then((snapshot) => {
+      if (snapshot.exists()) {
+        gameState = snapshot.val(); // Nadpisujemy dane w grze danymi z chmury
+        updateUI(); // Odświeżamy licznik na ekranie
+        alert("Wczytano zapis!");
+      }
+    });
+  };
+</script>
+</body>
+</html>
